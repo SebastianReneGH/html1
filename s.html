@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Estaciones - Calidad del Aire</title>
+    <style>
+        body { font-family: system-ui; padding: 20px; }
+        .station { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .aqi { display: inline-block; padding: 4px 12px; border-radius: 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Estaciones de Calidad del Aire</h1>
+    <div id="stations"></div>
+    
+    <script>
+        const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxZWdjZGl6b2x0Y2l1cHNvemNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNzE2MzYsImV4cCI6MjA3NDk0NzYzNn0.9PKz0IAC_3_tgF6q-n8ruckfLSt5XOcGDVzHSTTZsaI'
+        
+        fetch('https://kqegcdizoltciupsozco.supabase.co/rest/v1/latest_air_quality?select=*', {
+            headers: { 'apikey': API_KEY, 'Authorization': 'Bearer ' + API_KEY }
+        })
+        .then(r => r.json())
+        .then(stations => {
+            document.getElementById('stations').innerHTML = stations.map(s => `
+                <div class="station">
+                    <h3>${s.station_id}</h3>
+                    <p>📍 ${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}</p>
+                    ${s.pm25 ? `<span class="aqi" style="background: #${s.pm25 <= 50 ? '0e0' : 'ff0'}"PM2.5: ${s.pm25}</span>` : ''}
+                    ${s.o3 ? `<span class="aqi" style="background: #${s.o3 <= 50 ? '0e0' : 'ff0'}">O₃: ${s.o3}</span>` : ''}
+                </div>
+            `).join('')
+        })
+    </script>
+</body>
+</html>
